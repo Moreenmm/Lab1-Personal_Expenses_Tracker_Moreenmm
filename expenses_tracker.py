@@ -1,201 +1,73 @@
-'''import os
-from datetime import datetime
-
-#Creating the balance.txt file            
-BALANCE_FILE = "balance.txt"
-#adding some starting balance & checking if the file exists
-if not os.path.exists(BALANCE_FILE):
-    with open(BALANCE_FILE, "w") as f:
-        f.write("100")   
-    
-
-def check_balance():
-    with open(BALANCE_FILE, 'r') as file:
-       balance = float(file.read().strip())
-       print(f"Welcome! Your initial balance is: ${balance:.2f}")
-
-#asking user if they want to add money to their balance
-    answer = input("Do you wish to add money to your balance?(Y/N): ").strip().lower()
-    if answer == "y":
-        amount = float(input("Enter the amount you want to add: "))
-        try:
-            amount = float(amount)
-            if amount >0:
-                print("Amount updated successfully!")
-            else:
-                print("Enter a positive amount!")
-
-#Update balance in balance.txt file
-            new_balance = balance + amount 
-            with open(BALANCE_FILE, "w") as f:
-                f.write(str(new_balance))
-            print(f"Balance updated successfully! This is your new balance: {new_balance:.2f}") 
-
-        except:
-            print("Enter a valid Input!!")
-    elif answer == "n":
-        print("No changes made to your initial balance.")
-    else:
-        print("Enter a valid input!")
-
-today = datetime.today().strftime("%Y-%M-%D")
-EXPENSES_FILE = f"expense_{today}.txt"
-#checking if the file exists
-if not os.path.exists(EXPENSES_FILE):
-    open(EXPENSES_FILE, "w").close()
- 
-    print(f"New expense file has been created for {today}") 
-
-#viewing your expenses
-def view_expenses():
-    print("""
-          ================================================
-          Your expense for {today} is:
-          ================================================
-          """)
-    try:
-        with open(EXPENSES_FILE, 'r') as expenses:
-            lines = expenses.read()
-        if lines.strip() == "":
-            print("No expenses yet.")
-        else: 
-            print(lines)
-    except:
-        print("No recorded expenses at the moment!")
-        print()
-
-#Adding a new expense
-def add_expense():
-    try:
-        with open(BALANCE_FILE, 'r') as file:
-            current_balance= float(file.read().strip())
-    except:
-        current_balance = 0
-    print(f"Your available balance is ${current_balance}")
-
-    try:
-        expense = float(input("How much do you wish to spend? $"))
-        if expense <= 0:
-            print("Enter a positive amount!")
-            return
-        if expense > current_balance:
-            print("Insufficient Funds!!!")
-            return
-    except:
-        print("Enter a valid number.")
-        return
-    
-    Product = input("What did you buy? ")
-
-    #Saving the expenses after adding them
-    with open(EXPENSES_FILE, "a") as f:
-        f.write(f"{expense} - {Product}")
-                
-    #updating balance after an expense
-    new_balance = current_balance - expense
-    with open(BALANCE_FILE, "w") as f:
-        f.write(str(new_balance))
-
-        print(f"Balance updated successfully! This is your new balance: {new_balance}") 
-
-def main():
-    print("Welcome to the Personal Expenses Tracker!")
-    
-    while True:
-        print("")
-        print("""================================================
-                     MAIN MENU
-================================================
-        1. Check Your Remaining Balance
-        2. View Your Expenses
-        3. Add New Expense
-        4. Exit
-            """)
-        
-        choice = input("Enter your option to proceed: ").strip()
-        try:
-            choice=int(choice)
-        except:
-            print("Enter a valid input")
-            continue
-        
-        if choice == 1:
-            check_balance()      
-        elif choice == 2:
-            view_expenses()      
-        elif choice == 3:
-            add_expense()        
-        elif choice == 4:
-            print("Exiting and Saving data...") 
-            break  
-        else:
-            print("Invalid option. Please choose 1-4: ")
-
-main()'''
-
 import os
 from datetime import datetime
 
-#creating balance.txt file and adding some initial amount
 BALANCE_FILE = "balance.txt"
 
-
-if not os.path.exists(BALANCE_FILE):
+# ----------------------------------------------------
+# Create the balance file if it doesn't exist or is empty
+# ----------------------------------------------------
+if not os.path.exists(BALANCE_FILE) or os.path.getsize(BALANCE_FILE) == 0:
     with open(BALANCE_FILE, "w") as f:
         f.write("100.0")
-elif os.path.getsize(BALANCE_FILE) == 0:  
-    with open(BALANCE_FILE, "w") as f:
-        f.write("100.0")
 
-
-# Helper function
+# ----------------------------------------------------
+# Helper function to get expense file name
+# ----------------------------------------------------
 def get_expenses_file(date_str):
     return f"expenses_{date_str}.txt"
 
 
-
+# ----------------------------------------------------
+# Read balance safely
+# ----------------------------------------------------
 def read_balance():
     try:
-        with open(BALANCE_FILE, 'r') as file:
+        with open(BALANCE_FILE, "r") as file:
             content = file.read().strip()
             if content == "":
                 raise ValueError
             return float(content)
     except:
-        print("Warning: Resetting to $100.0")
-        with open(BALANCE_FILE, "w") as f:
-            f.write("100.0")
+        print("Warning: Resetting balance to $100.0")
+        write_balance(100.0)
         return 100.0
 
 
+# ----------------------------------------------------
+# Write new balance to file
+# ----------------------------------------------------
 def write_balance(amount):
     with open(BALANCE_FILE, "w") as f:
         f.write(f"{amount:.2f}")
 
 
-
+# ----------------------------------------------------
+# CHECK REMAINING BALANCE
+# ----------------------------------------------------
 def check_balance():
     balance = read_balance()
-    print(f"Welcome! Your current balance is: ${balance:.2f}")
+    print(f"\nYour current balance is: ${balance:.2f}")
 
-    answer = input("\nDo you wish to add money to your balance? (Y/N): ").strip().lower()
+    answer = input("Do you wish to add money? (Y/N): ").strip().lower()
     if answer == "y":
         try:
-            amount = float(input("Enter the amount you want to add: $"))
+            amount = float(input("Enter amount to add: $"))
             if amount > 0:
                 new_balance = balance + amount
                 write_balance(new_balance)
-                print(f"Amount added successfully!")
+                print(f"Amount successfully added!")
                 print(f"New balance: ${new_balance:.2f}\n")
             else:
-                print("Please enter a positive amount!")
+                print("Please enter a positive number.\n")
         except:
-            print("Invalid input! Please enter a number.")
+            print("Invalid input. Please enter a valid number.\n")
     else:
         print("No changes made.\n")
 
 
-
+# ----------------------------------------------------
+# VIEW EXPENSES
+# ----------------------------------------------------
 def view_expenses():
     while True:
         date_input = input("Enter date to view (YYYY-MM-DD) or press Enter for today: ").strip()
@@ -207,19 +79,19 @@ def view_expenses():
             date_str = date_input
             break
         except:
-            print("Invalid date format! Use YYYY-MM-DD (e.g. 2025-11-19)")
+            print("Invalid date format! Use YYYY-MM-DD")
 
     filename = get_expenses_file(date_str)
 
-    print(f"\n{'='*50}")
-    print(f"     EXPENSES FOR {date_str}")
-    print(f"{'='*50}")
+    print("\n========================================")
+    print(f"         EXPENSES FOR {date_str}")
+    print("========================================")
 
     if not os.path.exists(filename) or os.path.getsize(filename) == 0:
         print("No expenses recorded on this date.\n")
         return
 
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         lines = f.readlines()
 
     for i, line in enumerate(lines):
@@ -227,11 +99,14 @@ def view_expenses():
     print()
 
 
+# ----------------------------------------------------
+# ADD NEW EXPENSE
+# ----------------------------------------------------
 def add_expense():
     current_balance = read_balance()
-    print(f"Your available balance is: ${current_balance:.2f}\n")
+    print(f"\nYour available balance is: ${current_balance:.2f}\n")
 
-    # Get amount
+    # Get expense amount
     try:
         expense = float(input("How much did you spend? $"))
         if expense <= 0:
@@ -244,14 +119,14 @@ def add_expense():
         print("Please enter a valid number!")
         return
 
-    # Get item
+    # Get item name
     product = input("What did you buy? ").strip()
-    if not product:
+    if product == "":
         product = "No description"
 
     # Get date
     while True:
-        date_input = input("\nEnter date of expense (YYYY-MM-DD) or press Enter for today: ").strip()
+        date_input = input("Enter date of expense (YYYY-MM-DD) or press Enter for today: ").strip()
         if date_input == "":
             date_str = datetime.today().strftime("%Y-%m-%d")
             print(f"→ Using today: {date_str}")
@@ -262,34 +137,46 @@ def add_expense():
             print(f"→ Date set: {date_str}")
             break
         except ValueError:
-            print("Invalid date! Please use YYYY-MM-DD format.")
+            print("Invalid date format!")
+
+    # Determine next expense ID
+    filename = get_expenses_file(date_str)
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            existing = f.readlines()
+        expense_id = len(existing) + 1
+    else:
+        expense_id = 1
 
     # Save expense
-    filename = get_expenses_file(date_str)
     with open(filename, "a") as f:
-        f.write(f"${expense:.2f} - {product}\n")
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        f.write(f"ID {expense_id} | ${expense:.2f} | {product} | Time: {timestamp}\n")
 
     # Update balance
     new_balance = current_balance - expense
     write_balance(new_balance)
 
-    print(f"\nExpense successfully added on {date_str}!")
-    print(f"New balance: ${new_balance:.2f}\n")
+    print(f"\nExpense successfully added!")
+    print(f"Recorded as ID {expense_id} on {date_str}")
+    print(f"New balance on file: ${new_balance:.2f}\n")
 
 
-
+# ----------------------------------------------------
+# MAIN MENU SYSTEM
+# ----------------------------------------------------
 def main():
     print("Welcome to the Personal Expenses Tracker!\n")
 
     while True:
         print("""===============================
-               MAIN MENU
+           MAIN MENU
 ===============================
-        1. Check Your Remaining Balance
-        2. View Expenses (by date)
-        3. Add New Expense (any date!)
-        4. Exit
-              """)
+1. Check Remaining Balance
+2. View Expenses (by date)
+3. Add New Expense
+4. Exit
+""")
 
         choice = input("Enter your option (1-4): ").strip()
 
@@ -300,7 +187,7 @@ def main():
         elif choice == "3":
             add_expense()
         elif choice == "4":
-            print("Thank you for using Expenses Tracker! Goodbye!")
+            print("Thank you for using the Expenses Tracker! Goodbye!")
             break
         else:
             print("Invalid option! Please choose 1-4.\n")
